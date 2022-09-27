@@ -2,6 +2,7 @@ class PrototypesController < ApplicationController
 
   before_action :authenticate_user!, except: [:index, :show]
   before_action :move_to_index, only: [:edit, :update, :destroy]
+  before_action :user_not, only: [:edit]
 
   def index
     @prototypes = Prototype.all
@@ -29,11 +30,11 @@ class PrototypesController < ApplicationController
   def edit
     @prototype = Prototype.find(params[:id])
 
-    unless @prototype.user_id == current_user.id
-      redirect_to action: :index
-    end
-
-    #  @prototype = Prototype.find(params[:id])
+    # unless @prototype.user_id == current_user.id
+    #   redirect_to action: :index
+    # else
+    #   render :show
+    # end
 
   end
 
@@ -55,6 +56,13 @@ class PrototypesController < ApplicationController
   private
   def prototype_params
     params.require(:prototype).permit(:title, :catch_copy, :concept,:image).merge(user_id: current_user.id)
+  end
+
+  def user_not
+    @prototype = Prototype.find(params[:id])
+     unless @prototype.user_id == current_user.id
+     redirect_to action: :index
+     end
   end
 
   def move_to_index
